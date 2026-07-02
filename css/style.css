@@ -1,0 +1,723 @@
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Premium anti-aliasing on all text */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================
+   AURORA MESH BACKGROUND
+   Dark-slate base + fixed blurred radial-gradient blobs.
+   Zero JS cost — blobs never move.
+   ============================================================ */
+body {
+  background-color: #060714;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', sans-serif;
+  color: #ffffff;
+  padding: 32px 20px 56px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%,
+      rgba(110, 30, 210, 0.60) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 65% at 85% 80%,
+      rgba(45, 70, 230, 0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 78% 8%,
+      rgba(20, 110, 255, 0.32) 0%, transparent 65%);
+  filter: blur(90px);
+}
+
+/* All content above blobs */
+.dashboard,
+.toast,
+.modal-overlay {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   PAGE-LOAD ANIMATION — staggered card entrance
+   ============================================================ */
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.card {
+  animation: cardEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.card:nth-child(1) { animation-delay: 0.04s; }
+.card:nth-child(2) { animation-delay: 0.14s; }
+.card:nth-child(3) { animation-delay: 0.24s; }
+.card:nth-child(4) { animation-delay: 0.34s; }
+
+/* ============================================================
+   DASHBOARD GRID
+   ============================================================ */
+.dashboard {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+/* ============================================================
+   GLASSMORPHISM CARD — ultra-premium facelift
+   Softer border, deeper shadow, more breathing room.
+   ============================================================ */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 26px;
+  padding: 32px 30px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.30),
+    0  4px 16px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* Mouse-glow spotlight layer via ::before */
+  overflow: hidden;
+  position: relative;
+
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+/* Spotlight overlay — driven by --mouse-x / --mouse-y set by JS */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    650px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(170, 148, 255, 0.11) 0%,
+    transparent 70%
+  );
+}
+.card.hovered::before { opacity: 1; }
+
+/* Every direct child above the glow layer */
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.38),
+    0  6px 20px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* Card section title */
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ============================================================
+   GLASS INPUT — shared
+   ============================================================ */
+.glass-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 11px 16px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.22s, background 0.22s, box-shadow 0.22s;
+  width: 100%;
+}
+.glass-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+.glass-input:focus {
+  border-color: rgba(148, 130, 255, 0.75);
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 0 0 3px rgba(120, 90, 255, 0.18);
+}
+
+/* ============================================================
+   CUSTOM NUMBER INPUT — "Set duration" pill
+   ============================================================ */
+
+/* Chrome / Safari / Edge / Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] { -moz-appearance: textfield; }
+
+/* The custom minutes input specifically */
+#customMinutes {
+  width: 96px;
+  padding: 10px 14px;
+  border-radius: 50px;                       /* full pill shape */
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  outline: none;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+}
+#customMinutes::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+#customMinutes:focus {
+  border-color: rgba(148, 130, 255, 0.80);
+  background: rgba(148, 130, 255, 0.12);
+  box-shadow:
+    0 0 0 3px rgba(120, 90, 255, 0.20),
+    0 0 18px rgba(120, 90, 255, 0.25);
+}
+
+/* ============================================================
+   BUTTON STYLES
+   ============================================================ */
+.btn-primary {
+  background: rgba(99, 102, 241, 0.82);
+  border: 1px solid rgba(129, 140, 248, 0.50);
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.22s, transform 0.12s, box-shadow 0.22s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.btn-primary:hover  {
+  background: rgba(99, 102, 241, 1);
+  box-shadow: 0 5px 22px rgba(99, 102, 241, 0.45);
+}
+.btn-primary:active { transform: scale(0.95); }
+.btn-primary.small  { padding: 9px 14px; font-size: 0.83rem; border-radius: 10px; }
+
+.btn-secondary {
+  background: rgba(6, 182, 212, 0.58);
+  border: 1px solid rgba(103, 232, 249, 0.40);
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.22s, transform 0.12s, box-shadow 0.22s;
+}
+.btn-secondary:hover  {
+  background: rgba(6, 182, 212, 0.92);
+  box-shadow: 0 5px 22px rgba(6, 182, 212, 0.38);
+}
+.btn-secondary:active { transform: scale(0.95); }
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.58);
+  border: 1px solid rgba(252, 165, 165, 0.32);
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.22s, transform 0.12s, box-shadow 0.22s;
+}
+.btn-danger:hover  {
+  background: rgba(239, 68, 68, 0.92);
+  box-shadow: 0 5px 22px rgba(239, 68, 68, 0.38);
+}
+.btn-danger:active { transform: scale(0.95); }
+
+/* ============================================================
+   CARD 1 — GREETING CARD
+   ============================================================ */
+.greeting-card {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.clock {
+  font-size: 4.4rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-shadow:
+    0 0 32px rgba(165, 180, 252, 0.85),
+    0 0 64px rgba(120, 90, 255, 0.35);
+  margin-bottom: 8px;
+}
+
+.date {
+  font-size: 0.98rem;
+  color: rgba(255, 255, 255, 0.60);
+  margin-bottom: 12px;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+.greeting {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin-bottom: 22px;
+  color: rgba(255, 255, 255, 0.97);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Pencil inline edit icon */
+.edit-name-btn {
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9px;
+  padding: 4px 9px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  flex-shrink: 0;
+  outline: none;
+}
+.edit-name-btn:hover {
+  background: rgba(99, 102, 241, 0.48);
+  color: #fff;
+  transform: scale(1.1);
+}
+.edit-name-btn:active { transform: scale(0.93); }
+
+/* Name form — animated show/hide */
+.name-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 380px;
+  margin: 0 auto;
+  overflow: hidden;
+  transition: max-height 0.38s ease, opacity 0.32s ease;
+}
+.name-form.hidden {
+  max-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  margin: 0 auto;
+  padding: 0;
+}
+.name-form.visible {
+  max-height: 62px;
+  opacity: 1;
+}
+
+/* ============================================================
+   CARD 2 — TIMER CARD
+   ============================================================ */
+.timer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer-display {
+  font-size: 3.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 0 26px rgba(165, 180, 252, 0.70),
+    0 0 50px rgba(120, 90, 255, 0.25);
+  margin: 8px 0 22px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.timer-settings {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-label {
+  font-size: 0.80rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.preset-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-preset {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.70);
+  border-radius: 10px;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-preset:hover {
+  background: rgba(99, 102, 241, 0.42);
+  border-color: rgba(129, 140, 248, 0.55);
+  color: #fff;
+}
+.btn-preset.active {
+  background: rgba(99, 102, 241, 0.82);
+  border-color: rgba(129, 140, 248, 0.82);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+}
+
+.custom-duration {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ============================================================
+   CARD 3 — TO-DO LIST
+   ============================================================ */
+.todo-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-height: 330px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.task-list::-webkit-scrollbar { width: 4px; }
+.task-list::-webkit-scrollbar-track { background: transparent; }
+.task-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  padding: 11px 14px;
+  transition: background 0.18s;
+}
+.task-item:hover { background: rgba(255, 255, 255, 0.10); }
+
+.task-check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #818cf8;
+}
+
+.task-text {
+  flex: 1;
+  font-size: 0.93rem;
+  color: rgba(255, 255, 255, 0.92);
+  word-break: break-word;
+}
+.task-text.done {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.task-edit-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(148, 130, 255, 0.50);
+  border-radius: 8px;
+  padding: 6px 11px;
+  color: #fff;
+  font-size: 0.93rem;
+  outline: none;
+  /* hidden by default — JS toggles display */
+  display: none;
+  box-shadow: 0 0 0 2px rgba(120, 90, 255, 0.15);
+}
+
+.task-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 5px 7px;
+  border-radius: 7px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  /* Prevent double-click selecting surrounding text */
+  user-select: none;
+}
+.task-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+.task-btn.edit-btn   { font-size: 0.88rem; }
+.task-btn.delete-btn { color: rgba(252, 165, 165, 0.65); }
+.task-btn.delete-btn:hover { color: #fca5a5; background: rgba(252, 165, 165, 0.10); }
+
+/* ============================================================
+   CARD 4 — QUICK LINKS
+   ============================================================ */
+.link-form {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.links-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(99, 102, 241, 0.48);
+  border: 1px solid rgba(129, 140, 248, 0.42);
+  border-radius: 22px;
+  padding: 8px 16px 8px 14px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background 0.22s, transform 0.16s, box-shadow 0.22s;
+}
+.link-chip:hover {
+  background: rgba(99, 102, 241, 0.88);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.38);
+}
+
+.link-delete {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  padding: 0;
+}
+.link-delete:hover { background: rgba(239, 68, 68, 0.72); }
+
+/* ============================================================
+   TOAST NOTIFICATION
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(22px);
+  background: rgba(30, 28, 60, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  padding: 13px 26px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9998;
+  white-space: nowrap;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   3. TIMER COMPLETION MODAL
+   Full-screen overlay with blur + frosted glass card.
+   ============================================================ */
+
+/* Shake + scale-in animation for the modal card */
+@keyframes modalShake {
+  0%   { transform: scale(0.7);   opacity: 0; }
+  40%  { transform: scale(1.06);  opacity: 1; }
+  55%  { transform: scale(1.0) translateX(-6px); }
+  65%  { transform: scale(1.0) translateX( 6px); }
+  72%  { transform: scale(1.0) translateX(-4px); }
+  80%  { transform: scale(1.0) translateX( 4px); }
+  88%  { transform: scale(1.0) translateX(-2px); }
+  95%  { transform: scale(1.0) translateX( 2px); }
+  100% { transform: scale(1.0) translateX( 0); }
+}
+
+/* Full-screen overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Heavy backdrop blur — blurs the entire dashboard behind the modal */
+  background: rgba(4, 4, 20, 0.65);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  /* Fade in the overlay itself */
+  animation: overlayFadeIn 0.3s ease both;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* hidden state — the `hidden` attribute removes it from layout */
+.modal-overlay[hidden] { display: none; }
+
+/* Frosted glass modal card */
+.modal-card {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  padding: 48px 44px 40px;
+  max-width: 420px;
+  width: calc(100% - 40px);
+  text-align: center;
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.45),
+    0  8px 24px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  /* Shake + scale-in entrance */
+  animation: modalShake 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modal-icon {
+  font-size: 3.4rem;
+  line-height: 1;
+  margin-bottom: 18px;
+  /* Gentle pulse on the icon */
+  animation: iconPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes iconPulse {
+  from { transform: scale(1);    filter: brightness(1);   }
+  to   { transform: scale(1.12); filter: brightness(1.25); }
+}
+
+.modal-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.modal-body {
+  font-size: 0.96rem;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* Stop Alarm button — prominent, red/rose */
+.btn-stop-alarm {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.85), rgba(220, 38, 120, 0.80));
+  border: 1px solid rgba(255, 150, 170, 0.35);
+  color: #fff;
+  border-radius: 50px;
+  padding: 14px 40px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: transform 0.15s, box-shadow 0.22s, filter 0.22s;
+  box-shadow: 0 6px 28px rgba(239, 68, 68, 0.40);
+}
+.btn-stop-alarm:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 10px 36px rgba(239, 68, 68, 0.55);
+  transform: translateY(-2px);
+}
+.btn-stop-alarm:active { transform: scale(0.96) translateY(0); }
+
+/* ============================================================
+   RESPONSIVE — single column on small screens
+   ============================================================ */
+@media (max-width: 700px) {
+  .dashboard { grid-template-columns: 1fr; gap: 20px; }
+  .greeting-card { grid-column: 1; }
+  .clock          { font-size: 3rem; }
+  .timer-display  { font-size: 3rem; }
+  .modal-card     { padding: 36px 26px 30px; }
+}

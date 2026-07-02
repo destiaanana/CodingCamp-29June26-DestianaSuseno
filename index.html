@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do Life Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ========================================================
+       MAIN DASHBOARD WRAPPER
+  ======================================================== -->
+  <div class="dashboard">
+
+    <!-- ======================================================
+         CARD 1 — GREETING + CLOCK
+    ====================================================== -->
+    <div class="card greeting-card">
+      <!-- Real-time clock display -->
+      <div class="clock" id="clock">00:00:00</div>
+      <!-- Current date display -->
+      <div class="date" id="date"></div>
+      <!-- Dynamic greeting text (Good Morning / Afternoon / Evening) -->
+      <div class="greeting" id="greeting"></div>
+
+      <!-- Challenge 1: Custom name — toggles between display and edit mode -->
+      <div class="name-form" id="nameForm">
+        <input
+          type="text"
+          id="nameInput"
+          class="glass-input"
+          placeholder="Enter your name…"
+          maxlength="30"
+        />
+        <button class="btn-primary" id="saveNameBtn">Save</button>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         CARD 2 — FOCUS / POMODORO TIMER
+    ====================================================== -->
+    <div class="card timer-card">
+      <h2 class="card-title">🍅 Focus Timer</h2>
+
+      <!-- Timer display -->
+      <div class="timer-display" id="timerDisplay">25:00</div>
+
+      <!-- Timer control buttons -->
+      <div class="timer-controls">
+        <button class="btn-primary" id="startBtn">Start</button>
+        <button class="btn-secondary" id="stopBtn">Stop</button>
+        <button class="btn-danger" id="resetBtn">Reset</button>
+      </div>
+
+      <!-- Challenge 2: Custom Pomodoro duration -->
+      <div class="timer-settings">
+        <span class="settings-label">Set duration (mins):</span>
+        <div class="preset-btns">
+          <!-- Quick preset buttons -->
+          <button class="btn-preset" data-minutes="15">15</button>
+          <button class="btn-preset active" data-minutes="25">25</button>
+          <button class="btn-preset" data-minutes="50">50</button>
+        </div>
+        <!-- Manual custom duration input -->
+        <div class="custom-duration">
+          <input
+            type="number"
+            id="customMinutes"
+            class="glass-input small"
+            placeholder="Custom"
+            min="1"
+            max="120"
+          />
+          <button class="btn-primary small" id="setCustomBtn">Set</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         CARD 3 — TO-DO LIST
+    ====================================================== -->
+    <div class="card todo-card">
+      <h2 class="card-title">✅ To-Do List</h2>
+
+      <!-- Add task form -->
+      <div class="todo-form">
+        <input
+          type="text"
+          id="taskInput"
+          class="glass-input"
+          placeholder="Add a new task…"
+        />
+        <button class="btn-primary" id="addTaskBtn">Add</button>
+      </div>
+
+      <!-- Task list container — items injected by JS -->
+      <ul class="task-list" id="taskList"></ul>
+    </div>
+
+    <!-- ======================================================
+         CARD 4 — QUICK LINKS
+    ====================================================== -->
+    <div class="card links-card">
+      <h2 class="card-title">🔗 Quick Links</h2>
+
+      <!-- Add link form -->
+      <div class="link-form">
+        <input
+          type="text"
+          id="linkNameInput"
+          class="glass-input"
+          placeholder="Link name…"
+        />
+        <input
+          type="url"
+          id="linkUrlInput"
+          class="glass-input"
+          placeholder="https://…"
+        />
+        <button class="btn-primary" id="addLinkBtn">Add Link</button>
+      </div>
+
+      <!-- Quick links container — items injected by JS -->
+      <div class="links-container" id="linksContainer"></div>
+    </div>
+
+  </div><!-- /.dashboard -->
+
+  <!-- ========================================================
+       TIMER COMPLETION MODAL
+       Hidden by default. JS shows it when the countdown hits 0.
+  ======================================================== -->
+  <div class="modal-overlay" id="timerModal" role="dialog" aria-modal="true"
+       aria-labelledby="modalTitle" hidden>
+    <div class="modal-card" id="modalCard">
+      <!-- Animated checkmark / bell icon -->
+      <div class="modal-icon">⏰</div>
+      <h2 class="modal-title" id="modalTitle">Focus Session Complete!</h2>
+      <p class="modal-body">
+        Great work. Your alarm is ringing, take a well-deserved break.
+      </p>
+      <button class="btn-stop-alarm" id="stopAlarmBtn">Stop Alarm</button>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
