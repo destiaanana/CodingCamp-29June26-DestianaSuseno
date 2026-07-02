@@ -2,7 +2,7 @@
 
 A clean, ultra-modern, and highly interactive productivity dashboard built with a premium **iOS Glassmorphism** aesthetic, featuring a dynamic aurora mesh background and interactive card spotlight effects.
 
-This project was developed by **@destiaanana** as part of the RevoU Coding Camp assignment.
+This project was developed by [@destiaanana](https://github.com/destiaanana) as part of the RevoU Coding Camp mini project assignment.
 
 ## 🚀 Live Demo
 🔗 [Explore My Dashboard](https://destiaanana.github.io/CodingCamp-29June26-DestianaSuseno/)
